@@ -1,0 +1,335 @@
+/* ==========================================================================
+   ESTILOS GENERALES DEL CONTENEDOR PRINCIPAL
+   ========================================================================== */
+.panel-main-wrapper {
+  min-height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle, #1e40af 0%, #172554 70%, #0f172a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Tarjeta Central del Tablero */
+.panel-dashboard-card {
+  background: rgba(255, 255, 255, 0.98);
+  max-width: 1000px;
+  width: 100%;
+  padding: 40px;
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* ==========================================================================
+   CABECERA DEL PANEL (HEADER)
+   ========================================================================== */
+.panel-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.panel-header .sub-titulo {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 1.5px;
+  margin: 0 0 6px 0;
+}
+
+.panel-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0 0 15px 0;
+}
+
+/* Fila de Bienvenida del Usuario */
+.user-welcome-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.welcome-user {
+  font-size: 16px;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+}
+
+.user-highlight {
+  color: #2563eb;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Botón de audio de cabecera */
+.voice-main-btn {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  font-size: 14px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.voice-main-btn:hover {
+  background: #dbeafe;
+  transform: scale(1.05);
+}
+
+.post-verificacion {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* ==========================================================================
+   CUADRÍCULA DE LOS 6 NODOS (GRID)
+   ========================================================================== */
+.nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Tarjetas Individuales de los Módulos */
+.node-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  user-select: none;
+}
+
+.node-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  border-color: #bfdbfe;
+}
+
+/* Contenedores de Íconos circulares con fondos semánticos */
+.node-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.red-icon    { background: #fef2f2; border: 1px solid #fca5a5; }
+.orange-icon { background: #fff7ed; border: 1px solid #ffedd5; }
+.gold-icon   { background: #fef9c3; border: 1px solid #fef08a; }
+.blue-icon   { background: #eff6ff; border: 1px solid #bfdbfe; }
+.alert-icon  { background: #faf5ff; border: 1px solid #e9d5ff; }
+.green-icon  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+
+/* Textos de los Módulos */
+.node-text-wrapper h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 3px 0;
+  letter-spacing: 0.3px;
+}
+
+.node-text-wrapper p {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ==========================================================================
+   PIE DE PÁGINA (PANEL FOOTER)
+   ========================================================================== */
+.panel-footer {
+  margin-top: 10px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+/* Enlaces institucionales (Izquierda) */
+.footer-links-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.footer-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.links-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.links-row a {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.links-row a:hover {
+  color: #2563eb;
+}
+
+.dot-separator {
+  color: #cbd5e1;
+  font-size: 12px;
+  user-select: none;
+}
+
+.phone-support {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Botones de Acción (Derecha) */
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botón Cerrar Sesión */
+.btn-exit-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.btn-exit-panel:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);
+}
+
+.exit-icon {
+  font-size: 14px;
+}
+
+/* Botón Circular de Asistencia (?) */
+.help-icon-btn {
+  background: #1e293b;
+  color: #ffffff;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(30, 41, 59, 0.2);
+}
+
+.help-icon-btn:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.help-question-mark {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* ==========================================================================
+   ADAPTACIÓN RESPONSIVA (MEDIA QUERIES)
+   ========================================================================== */
+@media (max-width: 900px) {
+  .nodes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .nodes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .panel-dashboard-card {
+    padding: 24px;
+  }
+  
+  .panel-header h1 {
+    font-size: 22px;
+  }
+  
+  .panel-footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .footer-links-group {
+    align-items: center;
+  }
+  
+  .links-row {
+    justify-content: center;
+  }
+  
+  .footer-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}

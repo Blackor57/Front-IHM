@@ -1,0 +1,185 @@
+.alertas-main-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, #1e40af 0%, #172554 70%, #0f172a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.alertas-card {
+  background: rgba(255, 255, 255, 0.98);
+  max-width: 800px;
+  width: 100%;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btn-back-panel {
+  align-self: flex-start;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-panel:hover {
+  color: #2563eb;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.alertas-header .title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bell-icon { font-size: 26px; }
+
+.alertas-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+/* Lista de Tarjetas de Alertas */
+.alertas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.alerta-tile {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 5px solid #ef4444; /* Borde rojo para destacar alertas no leídas */
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.alerta-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
+}
+
+/* Modificación visual si la alerta ya está Leída */
+.alerta-tile.alerta-leida {
+  border-left-color: #cbd5e1;
+  background: #f8fafc;
+  opacity: 0.7;
+}
+
+.tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.alerta-leida .status-indicator {
+  background: transparent;
+}
+
+.tile-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.tile-body h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.alerta-leida .tile-body h3 {
+  color: #475569;
+}
+
+.tile-body p {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.tile-footer {
+  margin-top: 4px;
+}
+
+.action-hint {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  text-transform: uppercase;
+}
+
+/* Botón inferior de dictado */
+.btn-audio-report {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-audio-report:hover { background: #dcfce7; }
+
+/* Loader */
+.loading-box { text-align: center; padding: 40px 0; color: #64748b; }
+.circle-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(37, 99, 235, 0.1);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 15px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

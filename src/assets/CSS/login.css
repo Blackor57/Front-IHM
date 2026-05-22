@@ -1,0 +1,128 @@
+.login-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #1a365d 0%, #0284c7 60%, #0ea5e9 100%);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.login-card {
+  position: relative;
+  background: #ffffff;
+  max-width: 450px;
+  width: 100%;
+  padding: 40px;
+  padding-top: 65px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(15, 32, 39, 0.2);
+  box-sizing: border-box;
+  animation: scaleUpActive 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes scaleUpActive {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.card-header { text-align: center; margin-bottom: 30px; }
+.card-header h2 { font-size: 26px; color: #1e293b; margin-bottom: 8px; font-weight: 700; }
+.card-header p { font-size: 14px; color: #64748b; }
+.login-form { display: flex; flex-direction: column; gap: 20px; }
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+.input-group label { font-size: 13px; font-weight: 600; color: #475569; }
+
+.field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+  background: #f8fafc;
+}
+
+.field-wrapper:focus-within {
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.field-icon { padding-left: 14px; font-size: 16px; color: #94a3b8; }
+.field-wrapper input { width: 100%; padding: 14px 14px 14px 10px; border: none; outline: none; background: transparent; font-size: 15px; color: #1e293b; }
+.form-options { text-align: right; }
+.forgot-link { font-size: 13px; color: #1e3c72; text-decoration: none; font-weight: 500; }
+.forgot-link:hover { text-decoration: underline; }
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #1e3c72 0%, #2575fc 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(37, 117, 252, 0.25);
+}
+
+.btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 117, 252, 0.35); }
+.btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+.spinner { width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.card-footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; font-size: 14px; color: #64748b; }
+.register-link { color: #2575fc; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 4px; }
+.register-link:hover { text-decoration: underline; }
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: absolute;
+  top: 18px;
+  left: 25px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-back:hover { color: #1e3c72; background-color: #f0f9ff; border-color: #bae6fd; transform: translateX(-2px); }
+.back-icon { font-size: 14px; transition: transform 0.2s ease; }
+.btn-back:hover .back-icon { transform: translateX(-2px); }
+
+/* --- Elementos de micrófono IHM --- */
+.mic-btn {
+  background: none;
+  border: none;
+  padding: 0 14px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.mic-btn:hover { color: #2575fc; transform: scale(1.1); }
+.field-wrapper.is-listening { border-color: #ef4444 !important; background: #fef2f2; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important; }
+.pulse-animation { animation: micPulse 1.2s infinite ease-in-out; color: #ef4444; }
+@keyframes micPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }

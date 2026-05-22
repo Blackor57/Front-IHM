@@ -1,0 +1,181 @@
+.tramites-main-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, #1e40af 0%, #172554 70%, #0f172a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.tramites-card {
+  background: rgba(255, 255, 255, 0.98);
+  max-width: 950px;
+  width: 100%;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btn-back-panel {
+  align-self: flex-start;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-panel:hover {
+  color: #2563eb;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.tramites-header .title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.folder-icon { font-size: 26px; }
+
+.tramites-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+/* Tabla Estilizada */
+.table-responsive-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.tramites-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.tramites-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  padding: 14px 18px;
+  border-bottom: 2px solid #e2e8f0;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.tramites-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.font-bold-cell {
+  font-weight: 700;
+  color: #1e293b !important;
+}
+
+.date-cell {
+  font-weight: 600;
+  color: #475569;
+}
+
+/* Colores de texto informativos para fechas de término */
+.text-pending {
+  color: #d97706;
+  font-weight: 700;
+  background: #fffbeb;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.text-completed {
+  color: #1e293b;
+}
+
+/* Badges de Estados */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.en-proceso { background: #eff6ff; color: #2563eb; }
+.status-badge.aprobado   { background: #f0fdf4; color: #16a34a; }
+.status-badge.observado  { background: #fff5f5; color: #e53e3e; }
+
+/* Tags de Lectura (Visto) */
+.view-tag {
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.view-tag.tag-unread {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+/* Botón inferior de dictado */
+.btn-audio-report {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-audio-report:hover { background: #dcfce7; }
+
+/* Loader */
+.loading-box { text-align: center; padding: 40px 0; color: #64748b; }
+.circle-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(37, 99, 235, 0.1);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 15px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

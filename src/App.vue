@@ -1,20 +1,22 @@
 <script setup>
-
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div class="app-container">
-    <h1>¡Mi nuevo proyecto frontend!</h1>
-    <p>Este es el punto de partida de mi aplicación.</p>
+  <div class="main-app">
+    <RouterView />
   </div>
 </template>
 
-<style scoped>
-/* Estilos mínimos para empezar a maquetar */
-.app-container {
-  font-family: sans-serif;
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+<style>
+/* Estilos globales rápidos */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
+}
+.main-app {
+  min-height: 100vh;
 }
 </style>
