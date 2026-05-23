@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { procedureService } from '@/services/api' // <- Conexión real
 
 const router = useRouter()
 const listaTramites = ref([])
 const cargando = ref(true)
 const errorApi = ref(false)
 
-// Asistencia de voz nativa IHM
 const hablarTexto = (texto) => {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel()
@@ -17,44 +17,15 @@ const hablarTexto = (texto) => {
   }
 }
 
-// Simulación de carga mapeada de tu backend en Spring Boot
 const consultarTramites = async () => {
   cargando.value = true
   errorApi.value = false
-  
+
   try {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // Lista de trámites actualizada con fecha de inicio y término
-    listaTramites.value = [
-      {
-        id: 1,
-        nombre: 'Duplicado de DNI Electrónico',
-        estado: 'En Proceso',
-        visto: 'No leído',
-        fechaInicio: '10/05/2026',
-        fechaTermino: 'Pendiente'
-      },
-      {
-        id: 2,
-        nombre: 'Inscripción en el Padrón SIS',
-        estado: 'Aprobado',
-        visto: 'Leído',
-        fechaInicio: '02/05/2026',
-        fechaTermino: '08/05/2026'
-      },
-      {
-        id: 3,
-        nombre: 'Actualización de Estado Civil',
-        estado: 'Observado',
-        visto: 'No leído',
-        fechaInicio: '28/04/2026',
-        fechaTermino: 'Falta Sustento'
-      }
-    ]
-    
+    const data = await procedureService.getAll()
+    listaTramites.value = data
+
     hablarTexto(`Historial de trámites cargado. Tienes ${listaTramites.value.length} solicitudes registradas en el sistema.`)
-    
   } catch (err) {
     errorApi.value = true
     hablarTexto('Error al sincronizar las solicitudes con el servidor.')
@@ -76,7 +47,7 @@ const volverAlPanel = () => {
 <template>
   <div class="tramites-main-wrapper">
     <div class="tramites-card">
-      
+
       <button type="button" class="btn-back-panel" @click="volverAlPanel">
         ← Volver al Panel
       </button>
@@ -86,7 +57,7 @@ const volverAlPanel = () => {
           <span class="folder-icon">📄</span>
           <h2>Mis Trámites en Curso</h2>
         </div>
-        <p class="subtitle">Seguimiento detallado y cronograma de solicitudes ingresadas a la plataforma del estado</p>
+        <p class="subtitle">Seguimiento detallado de solicitudes ingresadas a la plataforma del estado</p>
       </header>
 
       <div v-if="cargando" class="loading-box">
@@ -103,43 +74,39 @@ const volverAlPanel = () => {
         <div class="table-responsive-container">
           <table class="tramites-table">
             <thead>
-              <tr>
-                <th>Trámite</th>
-                <th>Fecha Inicio</th>
-                <th>Fecha Término</th>
-                <th>Estado</th>
-                <th>Visto</th>
-              </tr>
+            <tr>
+              <th>Trámite</th>
+              <th>Descripción</th>
+              <th>Fecha Inicio</th>
+              <th>Estado</th>
+              <th>Visto</th>
+            </tr>
             </thead>
             <tbody>
-              <tr v-for="tramite in listaTramites" :key="tramite.id">
-                <td class="font-bold-cell">{{ tramite.nombre }}</td>
-                <td class="date-cell">{{ tramite.fechaInicio }}</td>
-                <td class="date-cell">
-                  <span :class="tramite.fechaTermino === 'Pendiente' ? 'text-pending' : 'text-completed'">
-                    {{ tramite.fechaTermino }}
+            <tr v-for="tramite in listaTramites" :key="tramite.id">
+              <td class="font-bold-cell">{{ tramite.type }}</td>
+              <td>{{ tramite.description }}</td>
+              <td class="date-cell">{{ new Date(tramite.createdAt).toLocaleDateString() }}</td>
+              <td>
+                  <span class="status-badge" :class="tramite.status.toLowerCase().replace(' ', '-')">
+                    {{ tramite.status }}
                   </span>
-                </td>
-                <td>
-                  <span class="status-badge" :class="tramite.estado.toLowerCase().replace(' ', '-')">
-                    {{ tramite.estado }}
+              </td>
+              <td>
+                  <span class="view-tag" :class="{ 'tag-unread': !tramite.checked }">
+                    {{ tramite.checked ? 'Leído' : 'No leído' }}
                   </span>
-                </td>
-                <td>
-                  <span class="view-tag" :class="{ 'tag-unread': tramite.visto === 'No leído' }">
-                    {{ tramite.visto }}
-                  </span>
-                </td>
-              </tr>
+              </td>
+            </tr>
             </tbody>
           </table>
         </div>
 
         <footer class="tramites-footer-actions">
-          <button 
-            type="button" 
-            class="btn-audio-report"
-            @click="hablarTexto('Se muestra en pantalla la tabla con sus trámites, incluyendo la fecha en que inició la solicitud y la fecha estimada de cierre o término.')"
+          <button
+              type="button"
+              class="btn-audio-report"
+              @click="hablarTexto('Se muestra en pantalla la tabla con sus trámites en curso y su estado actual.')"
           >
             🔊 Escuchar Reporte de Trámites
           </button>

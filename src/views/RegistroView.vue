@@ -1,10 +1,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '@/services/api.js' // <- Importamos el servicio
 
 const router = useRouter()
-const nombreCompleto = ref('')
-const correoElectronico = ref('')
+const dni = ref('') // <- Cambiado a DNI según especificación del backend
+const nombreCompleto = ref('') // Lo mantenemos solo para guardar el saludo localmente
+const correoElectronico = ref('') // Opcional para el registro según tu JSON original
 const contrasena = ref('')
 
 const mostrandoContrasena = ref(false)
@@ -20,30 +22,39 @@ const hablarTexto = (texto) => {
   }
 }
 
-const procesarRegistro = () => {
-  if (!nombreCompleto.value || !correoElectronico.value || !contrasena.value) {
+const procesarRegistro = async () => {
+  if (!dni.value || !contrasena.value || !nombreCompleto.value) {
     mensajeFeedback.value = 'Por favor, complete todos los campos requeridos.'
     hablarTexto(mensajeFeedback.value)
     return
   }
 
   cargandoReniec.value = true
-  mensajeFeedback.value = 'Validando sus datos de identidad ante el servicio de RENIEC...'
+  mensajeFeedback.value = 'Validando sus datos de identidad ante el servicio de RENIEC y registrando...'
   hablarTexto(mensajeFeedback.value)
 
-  setTimeout(() => {
+  try {
+    // Conexión real enviando dni y password como pide el backend
+    await authService.register({
+      dni: dni.value,
+      password: contrasena.value
+    })
+
     cargandoReniec.value = false
     mensajeFeedback.value = 'Registro exitoso. Identidad verificada correctamente.'
     hablarTexto(mensajeFeedback.value)
-    
-    // 🔥 GUARDAMOS EL NOMBRE DINÁMICO AQUÍ
+
     localStorage.setItem('nombreCiudadano', nombreCompleto.value)
-    
-    // Redirigir al panel después de registrarse exitosamente
+
     setTimeout(() => {
-      router.push('/panel-consultas')
+      router.push('/login') // Redirigimos al login para que obtenga su token seguro
     }, 1500)
-  }, 2500)
+
+  } catch (error) {
+    cargandoReniec.value = false
+    mensajeFeedback.value = error.response?.data?.message || 'Error en el registro. Verifique sus datos.'
+    hablarTexto(mensajeFeedback.value)
+  }
 }
 </script>
 
@@ -60,13 +71,19 @@ const procesarRegistro = () => {
       </header>
 
       <div class="form-body">
+        <!-- Input de DNI agregado para cumplir con el Backend -->
+        <div class="input-wrapper">
+          <input type="text" v-model="dni" placeholder="Número de DNI" aria-label="Número de DNI" maxlength="8" />
+          <button type="button" class="icon-btn" @click="hablarTexto('Campo DNI')">🆔</button>
+        </div>
+
         <div class="input-wrapper">
           <input type="text" v-model="nombreCompleto" placeholder="Nombre Completo" aria-label="Nombre Completo" />
           <button type="button" class="icon-btn" @click="hablarTexto('Campo Nombre Completo')">🔊</button>
         </div>
 
         <div class="input-wrapper">
-          <input type="email" v-model="correoElectronico" placeholder="Correo Electrónico" aria-label="Correo Electrónico" />
+          <input type="email" v-model="correoElectronico" placeholder="Correo Electrónico (Opcional)" aria-label="Correo Electrónico" />
           <button type="button" class="icon-btn" @click="hablarTexto('Campo Correo Electrónico')">👤</button>
         </div>
 
@@ -87,7 +104,7 @@ const procesarRegistro = () => {
       </div>
 
       <div class="card-footer">
-        <p>¿Ya tienes una cuenta? 
+        <p>¿Ya tienes una cuenta?
           <router-link to="/login" class="login-link">Inicia sesión aquí</router-link>
         </p>
       </div>

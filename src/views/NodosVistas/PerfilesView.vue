@@ -1,28 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { userService } from '@/services/api' // <- Conexión real
 
 const router = useRouter()
 const cargando = ref(true)
 const editando = ref(false)
 const errorApi = ref(false)
 
-// Campos exactos de la entidad Ciudadano
-const ciudadano = ref({
-  id: null,
-  dni: '',
-  nombre: '',
-  apellido: '',
-  telefono: '',
-  correo: '',
-  contrase_a: ''
-})
-
+const ciudadano = ref({ id: null, dni: '', name: '', phone: '', email: '', password: '' })
 const copiaCiudadano = ref({})
 
 const hablarTexto = (texto) => {
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel() // Limpia cualquier audio previo
+    window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(texto)
     utterance.lang = 'es-PE'
     window.speechSynthesis.speak(utterance)
@@ -32,32 +23,18 @@ const hablarTexto = (texto) => {
 const cargarPerfilCiudadano = async () => {
   cargando.value = true
   errorApi.value = false
-  
+
   try {
-    // Simulación de carga de red
-    await new Promise(resolve => setTimeout(resolve, 300))
-    
-    // PERSISTENCIA: Recuperamos lo guardado localmente en el navegador
-    const nombreGuardado = localStorage.getItem('nombreCiudadano') || 'LADY'
-    const correoGuardado = localStorage.getItem('correoCiudadano') || 'lady@gmail.com'
-    const passGuardada = localStorage.getItem('passCiudadana') || '********'
-    
-    ciudadano.value = {
-      id: 1,
-      dni: '74589632',
-      nombre: nombreGuardado,
-      apellido: 'QUISPE MENDOZA',
-      telefono: '987654321',
-      correo: correoGuardado,
-      contrase_a: passGuardada
-    }
-    
+    const data = await userService.getProfile()
+    ciudadano.value = { ...data, password: '********' }
     copiaCiudadano.value = { ...ciudadano.value }
-    hablarTexto(`Perfil cargado. Bienvenido ${ciudadano.value.nombre}.`)
+
+    localStorage.setItem('nombreCiudadano', data.name)
+    hablarTexto(`Perfil cargado correctamente.`)
   } catch (err) {
     errorApi.value = true
     hablarTexto('Error al conectar con el servidor.')
-  } finally {
+  } finally { //  ¡Corregido a finally!
     cargando.value = false
   }
 }
@@ -68,10 +45,8 @@ onMounted(() => {
 
 const habilitarEdicion = () => {
   editando.value = true
-  if (ciudadano.value.contrase_a === '********') {
-    ciudadano.value.contrase_a = ''
-  }
-  hablarTexto('Modo de edición activado. Puede modificar su correo y contraseña.')
+  ciudadano.value.password = ''
+  hablarTexto('Modo de edición activado. Puede modificar su correo, teléfono y contraseña.')
 }
 
 const cancelarEdicion = () => {
@@ -80,28 +55,29 @@ const cancelarEdicion = () => {
   hablarTexto('Edición cancelada.')
 }
 
-const guardarCambios = () => {
-  if (!ciudadano.value.correo.includes('@')) {
-    hablarTexto('Por favor, ingrese un correo válido.')
-    return
-  }
-
+const guardarCambios = async () => {
   cargando.value = true
   editando.value = false
-  
-  setTimeout(() => {
-    cargando.value = false
-    
-    // Guardamos los datos en el localStorage para que no se borren al regresar
-    localStorage.setItem('correoCiudadano', ciudadano.value.correo)
-    if (ciudadano.value.contrase_a.trim() !== '') {
-      localStorage.setItem('passCiudadana', ciudadano.value.contrase_a)
+
+  try {
+    const cambios = {
+      phone: ciudadano.value.phone,
+      email: ciudadano.value.email
     }
-    
-    ciudadano.value.contrase_a = '********'
+    if (ciudadano.value.password.trim() !== '') {
+      cambios.password = ciudadano.value.password
+    }
+
+    await userService.updateProfile(cambios)
+    ciudadano.value.password = '********'
     copiaCiudadano.value = { ...ciudadano.value }
     hablarTexto('Datos de acceso actualizados correctamente.')
-  }, 800)
+  } catch (error) {
+    hablarTexto('Error al intentar guardar los cambios.')
+    cancelarEdicion()
+  } finally {
+    cargando.value = false
+  }
 }
 
 const volverAlPanel = () => {
@@ -113,7 +89,7 @@ const volverAlPanel = () => {
 <template>
   <div class="perfil-main-wrapper">
     <div class="perfil-card">
-      
+
       <button type="button" class="btn-back-panel" @click="volverAlPanel">
         ← Volver al Panel
       </button>
@@ -138,51 +114,53 @@ const volverAlPanel = () => {
 
       <div class="perfil-content" v-else>
         <form @submit.prevent="guardarCambios">
-          
+
           <div class="info-card-grid">
-            
+
             <div class="info-tile disabled-field">
               <span class="tile-lbl">Documento de Identidad (DNI)</span>
               <p class="tile-val">{{ ciudadano.dni }}</p>
             </div>
 
             <div class="info-tile disabled-field">
-              <span class="tile-lbl">Nombres</span>
-              <p class="tile-val">{{ ciudadano.nombre }}</p>
+              <span class="tile-lbl">Nombre Completo</span>
+              <p class="tile-val">{{ ciudadano.name }}</p>
             </div>
 
-            <div class="info-tile disabled-field">
-              <span class="tile-lbl">Apellidos</span>
-              <p class="tile-val">{{ ciudadano.apellido }}</p>
-            </div>
-
-            <div class="info-tile disabled-field">
-              <span class="tile-lbl">Teléfono de Contacto</span>
-              <p class="tile-val">{{ ciudadano.telefono }}</p>
+            <div class="info-tile" :class="{ 'editable-field': editando }">
+              <label class="tile-lbl" for="telefono-input">Teléfono de Contacto</label>
+              <input
+                  id="telefono-input"
+                  type="text"
+                  v-model="ciudadano.phone"
+                  :disabled="!editando"
+                  class="perfil-input"
+                  required
+              />
             </div>
 
             <div class="info-tile" :class="{ 'editable-field': editando }">
               <label class="tile-lbl" for="correo-input">Correo Electrónico</label>
-              <input 
-                id="correo-input"
-                type="email" 
-                v-model="ciudadano.correo" 
-                :disabled="!editando"
-                class="perfil-input"
-                required
+              <input
+                  id="correo-input"
+                  type="email"
+                  v-model="ciudadano.email"
+                  :disabled="!editando"
+                  class="perfil-input"
+                  required
               />
             </div>
 
             <div class="info-tile" :class="{ 'editable-field': editando }">
               <label class="tile-lbl" for="pass-input">Contraseña de Acceso</label>
-              <input 
-                id="pass-input"
-                :type="editando ? 'text' : 'password'" 
-                v-model="ciudadano.contrase_a" 
-                :disabled="!editando"
-                :placeholder="editando ? 'Escriba la nueva contraseña' : ''"
-                class="perfil-input"
-                required
+              <input
+                  id="pass-input"
+                  :type="editando ? 'text' : 'password'"
+                  v-model="ciudadano.password"
+                  :disabled="!editando"
+                  :placeholder="editando ? 'Escriba la nueva contraseña' : '••••••••'"
+                  class="perfil-input"
+                  required
               />
             </div>
 
@@ -191,15 +169,7 @@ const volverAlPanel = () => {
           <footer class="perfil-actions">
             <div v-if="!editando" class="row-normal-actions">
               <button type="button" class="btn-edit-data" @click="habilitarEdicion">
-                ✏️ Modificar Correo y Contraseña
-              </button>
-              
-              <button 
-                type="button" 
-                class="btn-audio-report"
-                @click="hablarTexto(`Ciudadano: ${ciudadano.nombre}. Correo: ${ciudadano.correo}`)"
-              >
-                🔊 Escuchar Mis Datos
+                ✏️ Modificar Correo, Teléfono y Contraseña
               </button>
             </div>
 
@@ -221,6 +191,5 @@ const volverAlPanel = () => {
 </template>
 
 <style scoped>
-/* Importación limpia que jala los estilos del archivo externo */
 @import "@/assets/css/perfiles.css";
 </style>

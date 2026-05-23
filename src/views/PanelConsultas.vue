@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '@/services/api' // <- Conexión real para limpiar token
 
 const router = useRouter()
 
@@ -23,7 +24,7 @@ onMounted(() => {
   if (nombreGuardado) {
     nombreUsuario.value = nombreGuardado
   }
-  
+
   // Saludo automático personalizado al entrar a la vista
   hablarTexto(`Bienvenido ${nombreUsuario.value} al Panel de Consultas al Estado. Seleccione una de las opciones en pantalla.`)
 })
@@ -37,6 +38,7 @@ const irANodo = (ruta, nombreNodo) => {
 // Función para limpiar la sesión y salir de la plataforma de consultas
 const cerrarSesion = () => {
   hablarTexto('Cerrando sesión de forma segura. Volviendo al inicio.')
+  authService.logout() // <- LLAMADA REAL: Borra el token de Axios y localStorage
   localStorage.removeItem('nombreCiudadano') // Limpieza de seguridad
   router.push('/')
 }
@@ -45,18 +47,18 @@ const cerrarSesion = () => {
 <template>
   <div class="panel-main-wrapper">
     <div class="panel-dashboard-card">
-      
+
       <header class="panel-header">
         <p class="sub-titulo">PLATAFORMA DIGITAL DE ATENCIÓN</p>
         <h1>Panel de Consultas al Estado</h1>
-        
+
         <div class="user-welcome-row">
           <p class="welcome-user">BIENVENIDO, <span class="user-highlight">{{ nombreUsuario }}</span></p>
-          <button 
-            type="button"
-            class="voice-main-btn" 
-            @click="hablarTexto(`Sesión activa de ${nombreUsuario}`)"
-            title="Escuchar nombre del usuario"
+          <button
+              type="button"
+              class="voice-main-btn"
+              @click="hablarTexto(`Sesión activa de ${nombreUsuario}`)"
+              title="Escuchar nombre del usuario"
           >
             🔊
           </button>
@@ -115,7 +117,7 @@ const cerrarSesion = () => {
       </main>
 
       <footer class="panel-footer">
-        
+
         <div class="footer-links-group">
           <span class="footer-tag">Plataforma del Estado Peruano</span>
           <div class="links-row">
@@ -126,17 +128,17 @@ const cerrarSesion = () => {
             <span class="phone-support" title="Central Telefónica Nacional">📞 Central: 1845</span>
           </div>
         </div>
-        
+
         <div class="footer-actions">
           <button type="button" class="btn-exit-panel" @click="cerrarSesion">
             <span>Cerrar Sesión</span> <span class="exit-icon">🚪</span>
           </button>
-          
-          <button 
-            type="button"
-            class="help-icon-btn" 
-            @click="hablarTexto('Asistente de voz del panel activo. Presione cualquiera de las tarjetas superiores para gestionar sus datos, revisar bonos o verificar el estado de sus trámites en curso.')"
-            title="Escuchar guía de asistencia de voz"
+
+          <button
+              type="button"
+              class="help-icon-btn"
+              @click="hablarTexto('Asistente de voz del panel activo. Presione cualquiera de las tarjetas superiores para gestionar sus datos, revisar bonos o verificar el estado de sus trámites en curso.')"
+              title="Escuchar guía de asistencia de voz"
           >
             <span class="help-question-mark">?</span>
           </button>

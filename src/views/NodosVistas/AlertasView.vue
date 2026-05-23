@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { notificationService } from '@/services/api' // <- Conexión real
 
 const router = useRouter()
 const listaAlertas = ref([])
 const cargando = ref(true)
 const errorApi = ref(false)
 
-// Asistencia de voz nativa IHM
 const hablarTexto = (texto) => {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel()
@@ -17,46 +17,20 @@ const hablarTexto = (texto) => {
   }
 }
 
-// Simulación de carga de la entidad Alertas desde tu backend
 const consultarAlertas = async () => {
   cargando.value = true
   errorApi.value = false
-  
+
   try {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // Lista simulada mapeada de tu base de datos
-    listaAlertas.value = [
-      {
-        id: 1,
-        titulo: 'Campaña de Vacunación Integral',
-        mensaje: 'Se le recuerda que su centro médico asignado cuenta con dosis disponibles para el refuerzo estacional.',
-        fecha: '22/05/2026',
-        leido: false
-      },
-      {
-        id: 2,
-        titulo: 'Actualización de Credenciales Exitosa',
-        mensaje: 'Su correo electrónico de contacto ha sido modificado correctamente en la plataforma digital.',
-        fecha: '20/05/2026',
-        leido: true
-      },
-      {
-        id: 3,
-        titulo: 'Asignación de Subsidio Pendiente',
-        mensaje: 'Un nuevo abono monetario figura registrado bajo su número de DNI. Revise el módulo correspondiente.',
-        fecha: '15/05/2026',
-        leido: false
-      }
-    ]
-    
-    const pendientes = listaAlertas.value.filter(a => !a.leido).length
+    const data = await notificationService.getUnread()
+    listaAlertas.value = data
+
+    const pendientes = listaAlertas.value.filter(a => !a.checked).length
     if (pendientes > 0) {
       hablarTexto(`Bandeja de alertas sincronizada. Tienes ${pendientes} avisos nuevos sin leer.`)
     } else {
       hablarTexto(`Bandeja de alertas sincronizada. No registras nuevos avisos.`)
     }
-    
   } catch (err) {
     errorApi.value = true
     hablarTexto('Error al sincronizar las alertas del sistema.')
@@ -69,13 +43,20 @@ onMounted(() => {
   consultarAlertas()
 })
 
-// Función interactiva para marcar como leída la notificación de forma dinámica
-const marcarComoLeida = (alerta) => {
-  if (!alerta.leido) {
-    alerta.leido = true
-    hablarTexto(`Marcado como leído: ${alerta.titulo}`)
-  } else {
-    hablarTexto(`Leyendo aviso: ${alerta.mensaje}`)
+const marcarComoLeida = async (alerta) => {
+  if (!alerta.checked) {
+    try {
+      await notificationService.markAsRead({
+        id: alerta.id,
+        request: alerta.request
+      })
+      alerta.checked = true
+      hablarTexto(`Marcado como leído.`)
+      // Lo quitamos de la lista reactivamente
+      listaAlertas.value = listaAlertas.value.filter(a => a.id !== alerta.id || a.request !== alerta.request)
+    } catch (error) {
+      console.error(error)
+    }
   }
 }
 
@@ -88,7 +69,7 @@ const volverAlPanel = () => {
 <template>
   <div class="alertas-main-wrapper">
     <div class="alertas-card">
-      
+
       <button type="button" class="btn-back-panel" @click="volverAlPanel">
         ← Volver al Panel
       </button>
@@ -113,25 +94,27 @@ const volverAlPanel = () => {
 
       <div class="alertas-content" v-else>
         <div class="alertas-list">
-          
-          <div 
-            v-for="alerta in listaAlertas" 
-            :key="alerta.id" 
-            class="alerta-tile"
-            :class="{ 'alerta-leida': alerta.leido }"
-            @click="marcarComoLeida(alerta)"
+
+          <div
+              v-for="alerta in listaAlertas"
+              :key="alerta.id + '-' + alerta.request"
+              class="alerta-tile"
+              :class="{ 'alerta-leida': alerta.checked }"
+              @click="marcarComoLeida(alerta)"
           >
             <div class="tile-header">
               <span class="status-indicator"></span>
-              <span class="tile-date">{{ alerta.fecha }}</span>
+              <span class="tile-date">📅 {{ new Date(alerta.createdAt).toLocaleDateString() }}</span>
             </div>
-            
+
             <div class="tile-body">
-              <h3>{{ alerta.titulo }}</h3>
-              <p>{{ alerta.mensaje }}</p>
+              <h3>{{ alerta.type }}</h3>
+              <p v-if="alerta.request === 'bond'">Monto asignado: S/ {{ alerta.amount }}</p>
+              <p v-if="alerta.request === 'procedure'">Estado actual: {{ alerta.status }}</p>
+              <p v-if="alerta.request === 'affiliation'">Establecimiento: {{ alerta.stablishment }}</p>
             </div>
-            
-            <div class="tile-footer" v-if="!alerta.leido">
+
+            <div class="tile-footer" v-if="!alerta.checked">
               <span class="action-hint">👉 Presione para marcar como leído</span>
             </div>
           </div>
@@ -139,10 +122,10 @@ const volverAlPanel = () => {
         </div>
 
         <footer class="alertas-footer-actions">
-          <button 
-            type="button" 
-            class="btn-audio-report"
-            @click="hablarTexto('Se muestran en pantalla tres mensajes importantes. Puede presionar cualquiera de ellos para marcarlo como leído o volverlo a escuchar.')"
+          <button
+              type="button"
+              class="btn-audio-report"
+              @click="hablarTexto('Se muestran en pantalla sus avisos pendientes de revisión.')"
           >
             🔊 Escuchar Instrucciones
           </button>
@@ -154,6 +137,5 @@ const volverAlPanel = () => {
 </template>
 
 <style scoped>
-/* 🔥 Importación externa limpia para evitar problemas de compilación en Vite */
 @import "@/assets/css/alertas.css";
 </style>

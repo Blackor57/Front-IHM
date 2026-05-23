@@ -1,22 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { affiliationService } from '@/services/api' // <- Importación real
 
 const router = useRouter()
+const coberturaActual = ref({ tipoSeguro: 'Cargando...', estado: '...', establecimiento: '...' })
+const historialSeguros = ref([])
 const cargando = ref(true)
 const errorApi = ref(false)
 
-// Datos reactivos de la cobertura actual del Ciudadano
-const coberturaActual = ref({
-  tipoSeguro: 'SIS Para Todos',
-  estado: 'ACTIVO',
-  establecimiento: 'Centro de Salud Carabayllo (Posta Médica)'
-})
-
-// Historial de Seguros que el ciudadano tuvo previamente
-const historialSeguros = ref([])
-
-// Asistencia de voz nativa IHM
 const hablarTexto = (texto) => {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel()
@@ -29,31 +21,22 @@ const hablarTexto = (texto) => {
 const consultarSalud = async () => {
   cargando.value = true
   errorApi.value = false
-  
+
   try {
-    await new Promise(resolve => setTimeout(resolve, 400))
-    
-    // Datos históricos simulados de tu backend
-    historialSeguros.value = [
-      {
-        id: 101,
-        seguro: 'EsSalud - Régimen Regular',
-        entidad: 'Seguro Social de Salud',
-        fechaInicio: '01/02/2020',
-        fechaFin: '31/12/2024',
-        motivo: 'Cese Laboral'
-      },
-      {
-        id: 102,
-        seguro: 'SIS Microempresas',
-        entidad: 'Seguro Integral de Salud',
-        fechaInicio: '10/08/2018',
-        fechaFin: '15/01/2020',
-        motivo: 'Cambio de Régimen'
+    const data = await affiliationService.getAll()
+
+    if (data && data.length > 0) {
+      // Tomamos la primera como la cobertura activa actual
+      coberturaActual.value = {
+        tipoSeguro: data[0].type,
+        estado: data[0].status.toUpperCase(),
+        establecimiento: data[0].stablishment
       }
-    ]
-    
-    hablarTexto("Módulo de salud cargado. Se muestra su estado de aseguramiento actual y su historial de seguros pasados.")
+      // Mapeamos todo el array para la tabla
+      historialSeguros.value = data
+    }
+
+    hablarTexto("Módulo de salud cargado. Se muestra su estado de aseguramiento actual.")
   } catch (err) {
     errorApi.value = true
     hablarTexto('Error al conectar con el servidor de salud.')
@@ -75,7 +58,7 @@ const volverAlPanel = () => {
 <template>
   <div class="salud-main-wrapper">
     <div class="salud-card">
-      
+
       <button type="button" class="btn-back-panel" @click="volverAlPanel">
         ← Volver al Panel
       </button>
@@ -125,34 +108,34 @@ const volverAlPanel = () => {
           <div class="table-responsive-container">
             <table class="salud-table">
               <thead>
-                <tr>
-                  <th>Seguro / Régimen</th>
-                  <th>Entidad Emisora</th>
-                  <th>Fecha Inicio</th>
-                  <th>Fecha Fin</th>
-                  <th>Motivo de Fin</th>
-                </tr>
+              <tr>
+                <th>Seguro / Régimen</th>
+                <th>Establecimiento</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Estado</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="seguro in historialSeguros" :key="seguro.id">
-                  <td class="font-bold-cell">{{ seguro.seguro }}</td>
-                  <td class="text-nowrap-cell">{{ seguro.entidad }}</td>
-                  <td class="date-cell">{{ seguro.fechaInicio }}</td>
-                  <td class="date-cell">{{ seguro.fechaFin }}</td>
-                  <td class="text-nowrap-cell">
-                    <span class="reason-badge-fixed">{{ seguro.motivo }}</span>
-                  </td>
-                </tr>
+              <tr v-for="seguro in historialSeguros" :key="seguro.id">
+                <td class="font-bold-cell">{{ seguro.type }}</td>
+                <td class="text-nowrap-cell">{{ seguro.stablishment }}</td>
+                <td class="date-cell">{{ new Date(seguro.dateStart).toLocaleDateString() }}</td>
+                <td class="date-cell">{{ new Date(seguro.dateLimit).toLocaleDateString() }}</td>
+                <td class="text-nowrap-cell">
+                  <span class="reason-badge-fixed">{{ seguro.status }}</span>
+                </td>
+              </tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <footer class="salud-footer-actions">
-          <button 
-            type="button" 
-            class="btn-audio-report"
-            @click="hablarTexto(`Seguro actual: ${coberturaActual.tipoSeguro}. Estado: ${coberturaActual.estado}. Establecimiento: ${coberturaActual.establecimiento}.`)"
+          <button
+              type="button"
+              class="btn-audio-report"
+              @click="hablarTexto(`Seguro actual: ${coberturaActual.tipoSeguro}. Estado: ${coberturaActual.estado}. Establecimiento: ${coberturaActual.establecimiento}.`)"
           >
             🔊 Escuchar Reporte Completo
           </button>

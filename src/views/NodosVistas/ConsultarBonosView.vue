@@ -1,13 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { bondService } from '@/services/api' // <- Conexión real
 
 const router = useRouter()
 const listaBonos = ref([])
 const cargando = ref(true)
 const errorApi = ref(false)
 
-// Asistencia de voz nativa IHM
 const hablarTexto = (texto) => {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel()
@@ -17,48 +17,20 @@ const hablarTexto = (texto) => {
   }
 }
 
-// Consumo simulado de tu API que devuelve múltiples registros de la tabla Bono
 const consultarSubsidios = async () => {
   cargando.value = true
   errorApi.value = false
-  
+
   try {
-    // Simulación de espera de servidor (1 segundo)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Lista de bonos mapeados desde tu Base de Datos
-    listaBonos.value = [
-      {
-        id_bono: 601,
-        monto_bono: 350.00,
-        estado_bono: 'PENDIENTE',
-        fecha_emision: '15/05/2026',
-        nombre_subsidio: 'Bono Alimentario 2026'
-      },
-      {
-        id_bono: 402,
-        monto_bono: 270.00,
-        estado_bono: 'PAGADO',
-        fecha_emision: '12/11/2025',
-        nombre_subsidio: 'Subsidio Yanapay Extraordinario'
-      },
-      {
-        id_bono: 215,
-        monto_bono: 380.00,
-        estado_bono: 'PAGADO',
-        fecha_emision: '04/06/2025',
-        nombre_subsidio: 'Bono Familiar Centralizado'
-      }
-    ]
-    
-    // Contar cuántos están pendientes
-    const pendientes = listaBonos.value.filter(b => b.estado_bono === 'PENDIENTE').length
+    const data = await bondService.getAll()
+    listaBonos.value = data
+
+    const pendientes = listaBonos.value.filter(b => b.status === 'disponible').length
     if (pendientes > 0) {
-      hablarTexto(`Consulta completada. Registramos un total de ${listaBonos.value.length} subsidios. Tienes ${pendientes} bono pendiente por cobrar.`)
+      hablarTexto(`Consulta completada. Tienes ${pendientes} bono pendiente por cobrar.`)
     } else {
-      hablarTexto(`Consulta completada. Tienes ${listaBonos.value.length} bonos registrados y todos figuran como cobrados de forma exitosa.`)
+      hablarTexto(`Consulta completada. Todos tus bonos figuran cobrados.`)
     }
-    
   } catch (err) {
     errorApi.value = true
     hablarTexto('Error al conectar con el servidor de subsidios económicos.')
@@ -80,7 +52,7 @@ const volverAlPanel = () => {
 <template>
   <div class="bonos-main-wrapper">
     <div class="bonos-card">
-      
+
       <button class="btn-back-panel" @click="volverAlPanel" title="Volver al Panel de Consultas">
         ← Volver al Panel
       </button>
@@ -99,7 +71,7 @@ const volverAlPanel = () => {
       </div>
 
       <div v-else-if="errorApi" class="error-box">
-        <p>⚠️ Ocurrió un problema al traer los datos financieros del MIDIS.</p>
+        <p>⚠️ Ocurrió un problema al traer los datos financieros.</p>
         <button class="btn-retry" @click="consultarSubsidios">Reintentar</button>
       </div>
 
@@ -107,37 +79,37 @@ const volverAlPanel = () => {
         <div class="table-container">
           <table class="bonos-table">
             <thead>
-              <tr>
-                <th>Subsidio</th>
-                <th>Fecha Asignada</th>
-                <th>Monto</th>
-                <th>Estado de Cobro</th>
-              </tr>
+            <tr>
+              <th>Subsidio</th>
+              <th>Fecha Asignada</th>
+              <th>Monto</th>
+              <th>Estado de Cobro</th>
+            </tr>
             </thead>
             <tbody>
-              <tr v-for="bono in listaBonos" :key="bono.id_bono" class="bono-row">
-                <td class="td-name">
-                  <span class="sub-icon">{{ bono.estado_bono === 'PAGADO' ? '✅' : '⏳' }}</span>
-                  {{ bono.nombre_subsidio }}
-                </td>
-                <td class="td-date">{{ bono.fecha_emision }}</td>
-                <td class="td-amount font-bold">S/ {{ bono.monto_bono.toFixed(2) }}</td>
-                <td>
-                  <span class="status-badge" :class="bono.estado_bono.toLowerCase()">
+            <tr v-for="bono in listaBonos" :key="bono.id" class="bono-row">
+              <td class="td-name">
+                <span class="sub-icon">{{ bono.status === 'disponible' ? '⏳' : '✅' }}</span>
+                {{ bono.type }}
+              </td>
+              <td class="td-date">{{ new Date(bono.dateLimit).toLocaleDateString() }}</td>
+              <td class="td-amount font-bold">S/ {{ bono.amount.toFixed(2) }}</td>
+              <td>
+                  <span class="status-badge" :class="bono.status.toLowerCase()">
                     <span class="indicator-dot"></span>
-                    {{ bono.estado_bono }}
+                    {{ bono.status.toUpperCase() }}
                   </span>
-                </td>
-              </tr>
+              </td>
+            </tr>
             </tbody>
           </table>
         </div>
 
         <footer class="bonos-actions">
-          <button 
-            type="button" 
-            class="btn-audio-report"
-            @click="hablarTexto('Abajo en pantalla se muestra la tabla con tres filas. Las dos últimas corresponden a subsidios anteriores ya pagados por el banco de la nación.')"
+          <button
+              type="button"
+              class="btn-audio-report"
+              @click="hablarTexto('Se muestra en pantalla la lista de subsidios económicos asociados a su cuenta.')"
           >
             🔊 Escuchar Resumen de Historial
           </button>
